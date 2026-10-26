@@ -425,6 +425,7 @@ export function WorkspacePage({ page }: { page: string }) {
   const allSearchItems = useMemo(() => [...commitments.map((item) => ({ label: item.statement, path: "/commitments" })), ...projects.map((item) => ({ label: item.name, path: "/risk" })), ...tasks.map((item) => ({ label: item.name, path: "/dependencies" }))], []);
   const searchResults = globalSearch.length > 1 ? allSearchItems.filter((item) => item.label.toLowerCase().includes(globalSearch.toLowerCase())).slice(0, 5) : [];
   const showCommitment = (item: Commitment) => { setSelectedCommitment(item); setDetailOpen(true); };
+
   const handleSignOut = async () => {
     localStorage.removeItem("enterprise_auth_user");
     Object.keys(localStorage).forEach((key) => {
@@ -438,21 +439,140 @@ export function WorkspacePage({ page }: { page: string }) {
     await navigate({ to: "/auth", search: { next: undefined }, replace: true });
   };
 
-  return <div className="min-h-screen bg-background text-foreground"><Toaster position="bottom-right" richColors />
-    {mobileNav && <button className="fixed inset-0 z-40 bg-foreground/30 md:hidden" aria-label="Close navigation" onClick={() => setMobileNav(false)} />}
-    <aside className={cn("workspace-sidebar fixed inset-y-0 left-0 z-50 flex w-[254px] flex-col text-sidebar-foreground transition-transform md:translate-x-0", mobileNav ? "translate-x-0" : "-translate-x-full")}>
-      <div className="flex h-[68px] items-center gap-3 border-b border-sidebar-border px-5"><div className="flex size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground"><Blocks className="size-[18px]"/></div><div className="min-w-0"><div className="truncate text-[13px] font-semibold">Enterprise AI</div><div className="text-[10px] text-sidebar-foreground/65">WORKSPACE</div></div><button onClick={() => setMobileNav(false)} className="ml-auto rounded p-1 text-sidebar-foreground/70 md:hidden" aria-label="Close menu"><X className="size-4"/></button></div>
-      <button onClick={() => toast.info("Enterprise Workspace · demonstration environment")} className="mx-3 mt-4 flex items-center justify-between rounded-md border border-sidebar-border px-3 py-2 text-left"><span><span className="block text-[10px] text-sidebar-foreground/60">WORKSPACE</span><span className="mt-0.5 block text-xs font-medium">Acme Corporation</span></span><ChevronDown className="size-3.5 text-sidebar-foreground/60"/></button>
-      <nav className="mt-5 flex-1 overflow-y-auto px-3">{navigation.map((item) => { const { title: label, to, icon: Icon } = item; const section = "section" in item ? item.section : undefined; return <div key={to}>{section && <div className={cn("px-2 pb-2 text-[9px] font-semibold tracking-[0.14em] text-sidebar-foreground/45", section !== "WORKSPACE" && "pt-5")}>{section}</div>}<Link to={to} onClick={() => setMobileNav(false)} className={cn("group mb-1 flex h-9 items-center gap-3 rounded-md px-2.5 text-[12px] font-medium transition-colors", path === to ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm" : "text-sidebar-foreground/75 hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground")}><Icon className={cn("size-4 shrink-0", path === to ? "text-sidebar-primary" : "text-sidebar-foreground/55 group-hover:text-sidebar-accent-foreground")}/><span className="truncate">{label}</span>{label === "Approval Center" && <span className="ml-auto rounded-full bg-sidebar-primary/20 px-1.5 py-0.5 text-[9px] font-semibold text-sidebar-primary">3</span>}</Link></div>; })}</nav>
-      <div className="mx-3 mb-3 rounded-md border border-sidebar-border bg-sidebar-accent/40 p-3"><div className="flex items-center gap-2"><div className="size-1.5 rounded-full bg-success"/><span className="text-[10px] font-medium">Demo environment</span></div><div className="mt-1.5 text-[10px] leading-4 text-sidebar-foreground/60">Connected intelligence is simulated with sample data.</div></div>
-      <div className="border-t border-sidebar-border">
-        <button onClick={() => { void navigate({ to: "/settings" }); setMobileNav(false); }} className="flex w-full items-center gap-2.5 px-4 py-3 text-left transition-colors hover:bg-sidebar-accent/50"><PersonAvatar employee={profileEmployee(profile)} size="sm"/><div className="min-w-0 flex-1"><div className="truncate text-xs font-medium">{profile?.display_name ?? (profileLoading ? "Loading…" : "Workspace member")}</div><div className="truncate text-[10px] text-sidebar-foreground/55">{roleLabelFor(profile, profileLoading)}</div></div></button>
-        <button onClick={handleSignOut} className="flex w-full items-center gap-2 px-4 pb-3 text-[11px] font-medium text-sidebar-foreground/70 transition-colors hover:text-sidebar-foreground"><LogOut className="size-3.5" />Sign out</button>
-      </div>
-    </aside>
-    <main className="min-h-screen md:pl-[254px]"><header className="sticky top-0 z-30 flex h-[60px] items-center justify-between gap-3 border-b border-border bg-background/95 px-4 backdrop-blur-md md:px-7"><div className="flex min-w-0 items-center gap-3"><Button variant="ghost" size="icon" className="-ml-2 md:hidden" aria-label="Open menu" onClick={() => setMobileNav(true)}><Menu className="size-5"/></Button><div className="hidden items-center gap-2 text-[11px] text-muted-foreground sm:flex"><span>Acme Corporation</span><ChevronRight className="size-3"/></div><div className="truncate text-xs font-semibold sm:text-sm">{title}</div></div><div className="flex items-center gap-2"><div className="relative hidden w-64 md:block"><Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"/><Input aria-label="Search workspace" placeholder="Search workspace..." className="h-8 pl-8 pr-14 text-xs" value={globalSearch} onChange={(event) => setGlobalSearch(event.target.value)}/><kbd className="absolute right-2 top-1/2 -translate-y-1/2 rounded border border-border px-1 text-[9px] text-muted-foreground">⌘ K</kbd>{searchResults.length > 0 && <div className="absolute right-0 top-10 z-50 w-full rounded-md border border-border bg-popover p-1 shadow-lg">{searchResults.map((result) => <Link key={`${result.path}-${result.label}`} to={result.path} onClick={() => setGlobalSearch("")} className="block rounded px-2 py-2 text-xs hover:bg-muted">{result.label}</Link>)}</div>}</div><Button variant="ghost" size="icon" aria-label="Notifications" className="relative" onClick={() => toast.info("You are up to date with the latest workspace signals.")}><Bell className="size-4"/><span className="absolute right-2 top-2 size-1.5 rounded-full bg-risk ring-2 ring-background"/></Button><div className="ml-1 hidden h-7 w-px bg-border sm:block"/><DropdownMenu><DropdownMenuTrigger asChild><button className="flex items-center gap-2 rounded-md p-1 hover:bg-muted" aria-label="Account menu"><PersonAvatar employee={profileEmployee(profile)} size="sm"/><span className="hidden text-xs font-medium lg:block">{profile?.display_name ?? "Account"}</span><ChevronDown className="hidden size-3 text-muted-foreground lg:block"/></button></DropdownMenuTrigger><DropdownMenuContent align="end" className="w-56"><DropdownMenuLabel><div className="text-sm font-semibold">{profile?.display_name ?? "Workspace member"}</div><div className="text-xs font-normal text-muted-foreground">{profile?.email}</div></DropdownMenuLabel><DropdownMenuSeparator /><DropdownMenuItem onClick={() => void navigate({ to: "/settings" })}>Profile settings</DropdownMenuSeparator><DropdownMenuSeparator /><DropdownMenuItem onClick={handleSignOut} className="text-risk focus:text-risk"><LogOut className="size-3.5" />Sign out</DropdownMenuItem></DropdownMenuContent></DropdownMenu></div></header>
-      <div className="mx-auto max-w-[1500px] p-4 pb-10 md:p-7 xl:p-8">{path === "/" ? <Overview openCommitment={showCommitment} profile={profile}/> : path === "/commitments" ? <CommitmentPage openCommitment={showCommitment}/> : path === "/workload" ? <WorkloadPage/> : path === "/meetings" ? <MeetingPage/> : path === "/dependencies" ? <DependenciesPage openNode={true} selectedNode={selectedNode} setSelectedNode={setSelectedNode}/> : path === "/risk" ? <RiskPage/> : path === "/approvals" ? <ApprovalsPage/> : <SettingsPage profile={profile} refreshProfile={refreshProfile}/>}</div>
-    </main>
-    <CommitmentDetail item={selectedCommitment} open={detailOpen} setOpen={setDetailOpen}/>
-  </div>;
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <Toaster position="bottom-right" richColors />
+      {mobileNav && <button className="fixed inset-0 z-40 bg-foreground/30 md:hidden" aria-label="Close navigation" onClick={() => setMobileNav(false)} />}
+      
+      <aside className={cn("workspace-sidebar fixed inset-y-0 left-0 z-50 flex w-[254px] flex-col text-sidebar-foreground transition-transform md:translate-x-0", mobileNav ? "translate-x-0" : "-translate-x-full")}>
+        <div className="flex h-[68px] items-center gap-3 border-b border-sidebar-border px-5">
+          <div className="flex size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
+            <Blocks className="size-[18px]"/>
+          </div>
+          <div className="min-w-0">
+            <div className="truncate text-[13px] font-semibold">Enterprise AI</div>
+            <div className="text-[10px] text-sidebar-foreground/65">WORKSPACE</div>
+          </div>
+          <button onClick={() => setMobileNav(false)} className="ml-auto rounded p-1 text-sidebar-foreground/70 md:hidden" aria-label="Close menu">
+            <X className="size-4"/>
+          </button>
+        </div>
+        
+        <button onClick={() => toast.info("Enterprise Workspace · demonstration environment")} className="mx-3 mt-4 flex items-center justify-between rounded-md border border-sidebar-border px-3 py-2 text-left">
+          <span>
+            <span className="block text-[10px] text-sidebar-foreground/60">WORKSPACE</span>
+            <span className="mt-0.5 block text-xs font-medium">Acme Corporation</span>
+          </span>
+          <ChevronDown className="size-3.5 text-sidebar-foreground/60"/>
+        </button>
+        
+        <nav className="mt-5 flex-1 overflow-y-auto px-3">
+          {navigation.map((item) => {
+            const { title: label, to, icon: Icon } = item;
+            const section = "section" in item ? item.section : undefined;
+            return (
+              <div key={to}>
+                {section && <div className={cn("px-2 pb-2 text-[9px] font-semibold tracking-[0.14em] text-sidebar-foreground/45", section !== "WORKSPACE" && "pt-5")}>{section}</div>}
+                <Link to={to} onClick={() => setMobileNav(false)} className={cn("group mb-1 flex h-9 items-center gap-3 rounded-md px-2.5 text-[12px] font-medium transition-colors", path === to ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm" : "text-sidebar-foreground/75 hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground")}>
+                  <Icon className={cn("size-4 shrink-0", path === to ? "text-sidebar-primary" : "text-sidebar-foreground/55 group-hover:text-sidebar-accent-foreground")}/>
+                  <span className="truncate">{label}</span>
+                  {label === "Approval Center" && <span className="ml-auto rounded-full bg-sidebar-primary/20 px-1.5 py-0.5 text-[9px] font-semibold text-sidebar-primary">3</span>}
+                </Link>
+              </div>
+            );
+          })}
+        </nav>
+        
+        <div className="mx-3 mb-3 rounded-md border border-sidebar-border bg-sidebar-accent/40 p-3">
+          <div className="flex items-center gap-2">
+            <div className="size-1.5 rounded-full bg-success"/>
+            <span className="text-[10px] font-medium">Demo environment</span>
+          </div>
+          <div className="mt-1.5 text-[10px] leading-4 text-sidebar-foreground/60">Connected intelligence is simulated with sample data.</div>
+        </div>
+        
+        <div className="border-t border-sidebar-border">
+          <button onClick={() => { void navigate({ to: "/settings" }); setMobileNav(false); }} className="flex w-full items-center gap-2.5 px-4 py-3 text-left transition-colors hover:bg-sidebar-accent/50">
+            <PersonAvatar employee={profileEmployee(profile)} size="sm"/>
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-xs font-medium">{profile?.display_name ?? (profileLoading ? "Loading…" : "Workspace member")}</div>
+              <div className="truncate text-[10px] text-sidebar-foreground/55">{roleLabelFor(profile, profileLoading)}</div>
+            </div>
+          </button>
+          <button onClick={handleSignOut} className="flex w-full items-center gap-2 px-4 pb-3 text-[11px] font-medium text-sidebar-foreground/70 transition-colors hover:text-sidebar-foreground">
+            <LogOut className="size-3.5" />Sign out
+          </button>
+        </div>
+      </aside>
+
+      <main className="min-h-screen md:pl-[254px]">
+        <header className="sticky top-0 z-30 flex h-[60px] items-center justify-between gap-3 border-b border-border bg-background/95 px-4 backdrop-blur-md md:px-7">
+          <div className="flex min-w-0 items-center gap-3">
+            <Button variant="ghost" size="icon" className="-ml-2 md:hidden" aria-label="Open menu" onClick={() => setMobileNav(true)}>
+              <Menu className="size-5"/>
+            </Button>
+            <div className="hidden items-center gap-2 text-[11px] text-muted-foreground sm:flex">
+              <span>Acme Corporation</span>
+              <ChevronRight className="size-3"/>
+            </div>
+            <div className="truncate text-xs font-semibold sm:text-sm">{title}</div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <div className="relative hidden w-64 md:block">
+              <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"/>
+              <Input aria-label="Search workspace" placeholder="Search workspace..." className="h-8 pl-8 pr-14 text-xs" value={globalSearch} onChange={(event) => setGlobalSearch(event.target.value)}/>
+              <kbd className="absolute right-2 top-1/2 -translate-y-1/2 rounded border border-border px-1 text-[9px] text-muted-foreground">⌘ K</kbd>
+              {searchResults.length > 0 && (
+                <div className="absolute right-0 top-10 z-50 w-full rounded-md border border-border bg-popover p-1 shadow-lg">
+                  {searchResults.map((result) => (
+                    <Link key={`${result.path}-${result.label}`} to={result.path} onClick={() => setGlobalSearch("")} className="block rounded px-2 py-2 text-xs hover:bg-muted">
+                      {result.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <Button variant="ghost" size="icon" aria-label="Notifications" className="relative" onClick={() => toast.info("You are up to date with the latest workspace signals.")}>
+              <Bell className="size-4"/>
+              <span className="absolute right-2 top-2 size-1.5 rounded-full bg-risk ring-2 ring-background"/>
+            </Button>
+            
+            <div className="ml-1 hidden h-7 w-px bg-border sm:block"/>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 rounded-md p-1 hover:bg-muted" aria-label="Account menu">
+                  <PersonAvatar employee={profileEmployee(profile)} size="sm"/>
+                  <span className="hidden text-xs font-medium lg:block">{profile?.display_name ?? "Account"}</span>
+                  <ChevronDown className="hidden size-3 text-muted-foreground lg:block"/>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                  <div className="text-sm font-semibold">{profile?.display_name ?? "Workspace member"}</div>
+                  <div className="text-xs font-normal text-muted-foreground">{profile?.email}</div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => void navigate({ to: "/settings" })}>
+                  Profile settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut} className="text-risk focus:text-risk">
+                  <LogOut className="size-3.5" />Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </header>
+
+        <div className="mx-auto max-w-[1500px] p-4 pb-10 md:p-7 xl:p-8">
+          {path === "/" ? <Overview openCommitment={showCommitment} profile={profile}/> : path === "/commitments" ? <CommitmentPage openCommitment={showCommitment}/> : path === "/workload" ? <WorkloadPage/> : path === "/meetings" ? <MeetingPage/> : path === "/dependencies" ? <DependenciesPage openNode={true} selectedNode={selectedNode} setSelectedNode={setSelectedNode}/> : path === "/risk" ? <RiskPage/> : path === "/approvals" ? <ApprovalsPage/> : <SettingsPage profile={profile} refreshProfile={refreshProfile}/>}
+        </div>
+      </main>
+
+      <CommitmentDetail item={selectedCommitment} open={detailOpen} setOpen={setDetailOpen}/>
+    </div>
+  );
 }
