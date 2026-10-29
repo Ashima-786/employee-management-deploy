@@ -6,15 +6,44 @@
 
 ---
 
+# 🏢 Enterprise AI Workspace
+
+> A production-ready, containerized employee management platform. Built with React/Node and deployed on AWS EC2 via an automated GitHub Actions CI/CD pipeline.
+
+🌐 **Live Deployment:** [http://13.60.211.165:8081](http://13.60.211.165:8081)
+
+---
+
 ## 🏗️ Cloud Architecture
 
 ```mermaid
-flowchart LR
-    GitHub["GitHub Actions"] -- "Automated SSH" --> EC2["AWS EC2 Host (13.60.211.165)"]
-    EC2 --> Frontend["Frontend Container (Port 8081)"]
-    EC2 --> Backend["Backend Container (Port 5000)"]
-    Frontend -. "Auth" .-> Supabase[("Supabase (JWT)")]
-    Backend -. "State" .-> Mongo[("MongoDB Atlas")]
+flowchart TD
+    %% Define Nodes & Subgraphs
+    Client[🖥️ User Browser]
+    CI[⚙️ GitHub Actions CI/CD]
+
+    subgraph AWS ["☁️ AWS EC2 Server (13.60.211.165)"]
+        direction TB
+        UI[⚛️ React Frontend<br/>Port 8081]
+        API[🟢 Node.js Backend<br/>Port 5000]
+    end
+
+    subgraph DB ["🌍 Managed Cloud Services"]
+        direction LR
+        Auth[(🔐 Supabase Auth)]
+        Atlas[(🍃 MongoDB Atlas)]
+    end
+
+    %% Connections
+    Client -->|HTTP Request| UI
+    CI -->|Automated SSH Deploy| AWS
+    UI <-->|REST API| API
+    UI -->|JWT Auth| Auth
+    API -->|Mongoose DB| Atlas
+
+    %% Styling
+    style AWS fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style DB fill:#eef9fe,stroke:#333,stroke-width:2px
 🎯 Key DevOps Features
 Automated CI/CD Pipeline: Zero-touch deployments to AWS upon pushing to the main branch.
 
