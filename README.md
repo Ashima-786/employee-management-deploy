@@ -1,68 +1,57 @@
-# 🏢 Enterprise AI Workspace
+# Employee Management System
 
-> A production-ready, containerized employee management platform. Built with React/Node and deployed on AWS EC2 via an automated GitHub Actions CI/CD pipeline.
+A full-stack containerized enterprise workspace application designed to manage employee data, workspaces, and simulated commitment intelligence. This project demonstrates a modern cloud-native architecture using a decoupled frontend and backend, orchestrated with Docker, and deployed on an AWS EC2 instance.
 
-🌐 **Live Deployment:** [http://13.60.211.165:8081](http://13.60.211.165:8081)
+## 🚀 Tech Stack & Architecture
 
----
+- Frontend: React, TypeScript, Tailwind CSS, Vite
+- Backend: Node.js, Express.js
+- Database: MongoDB Atlas (Cloud Database) & Drizzle ORM setup
+- Authentication: Supabase (Backend-as-a-Service)
+- DevOps & Orchestration: Docker, Docker Compose
+- Cloud Infrastructure: AWS EC2 (Ubuntu Linux)
 
-# 🏢 Enterprise AI Workspace
+## 📁 Project Directory Structure
 
-> A production-ready, containerized employee management platform. Built with React/Node and deployed on AWS EC2 via an automated GitHub Actions CI/CD pipeline.
+pixel-perfect-recreation-502-main/
+├── backend/ # Node.js & Express API Server
+│ ├── models/ # Database schemas (e.g., Workspace.js)
+│ ├── routes/ # API route controllers (e.g., workspaceRoutes.js)
+│ ├── server.js # Main Express application entry point
+│ ├── seed.js # Database seeding script
+│ ├── server.test.js # Backend unit tests
+│ ├── Dockerfile # Container configuration for the backend
+│ └── package.json # Backend-specific dependencies
+│
+├── src/ # React Frontend Application
+│ ├── components/ # Reusable UI components
+│ ├── pages/ # Main application views
+│ └── main.tsx # React application entry point
+│
+├── public/ # Static assets (images, icons, etc.)
+├── supabase/ # Supabase project configuration & edge functions
+├── drizzle/ # Drizzle ORM migrations and schemas
+│
+├── docker-compose.yml # Multi-container orchestration (Frontend + Backend)
+├── Dockerfile # Container configuration for the frontend
+├── drizzle.config.ts # Drizzle ORM configuration
+├── package.json # Root workspace and frontend dependencies
+├── .env # Global environment variables (Ignored by Git)
+└── README.md # Project documentation
 
-🌐 **Live Deployment:** [http://13.60.211.165:8081](http://13.60.211.165:8081)
+✨ Key Features
+Secure Authentication: Offloaded user management, password hashing, and session handling entirely to Supabase for enterprise-grade security.
 
----
+Workspace Management: RESTful API architecture for creating, fetching, and managing organizational workspaces via /backend/routes/workspaceRoutes.js.
 
-## 🏗️ Cloud Architecture
+Commitment Intelligence UI: A sophisticated frontend demonstration of AI-driven meeting analysis and project commitment tracking.
 
-```mermaid
-flowchart TD
-    %% Define Nodes & Subgraphs
-    Client[🖥️ User Browser]
-    CI[⚙️ GitHub Actions CI/CD]
+Containerized Environment: Fully orchestrated multi-container setup eliminating the "it works on my machine" problem, ensuring exact parity between local development and production environments.
 
-    subgraph AWS ["☁️ AWS EC2 Server (13.60.211.165)"]
-        direction TB
-        UI[⚛️ React Frontend<br/>Port 8081]
-        API[🟢 Node.js Backend<br/>Port 5000]
-    end
+🛠️ Local Development Setup
+Prerequisites
+Docker & Docker Compose installed
 
-    subgraph DB ["🌍 Managed Cloud Services"]
-        direction LR
-        Auth[(🔐 Supabase Auth)]
-        Atlas[(🍃 MongoDB Atlas)]
-    end
+A MongoDB Atlas cluster URI
 
-    %% Connections
-    Client -->|HTTP Request| UI
-    CI -->|Automated SSH Deploy| AWS
-    UI <-->|REST API| API
-    UI -->|JWT Auth| Auth
-    API -->|Mongoose DB| Atlas
-
-    %% Styling
-    style AWS fill:#f9f9f9,stroke:#333,stroke-width:2px
-    style DB fill:#eef9fe,stroke:#333,stroke-width:2px
-🎯 Key DevOps Features
-Automated CI/CD Pipeline: Zero-touch deployments to AWS upon pushing to the main branch.
-
-Zero-Cost Infrastructure: 100% contained within the AWS, MongoDB, and Supabase Free Tiers.
-
-Memory Optimization: 2GB OS swap space configured to prevent Node/Vite build crashes (OOM kills).
-
-Decoupled State: Container compute is strictly stateless; data is securely managed by external cloud clusters.
-
-🚀 Local Quick Start
-Bash
-git clone [https://github.com/Ashima-786/employee-management-deploy.git](https://github.com/Ashima-786/employee-management-deploy.git)
-cd employee-management-deploy
-docker compose up --build -d
-
-### How to Push It Successfully
-
-To bypass the `rejected` error you got earlier and get this clean README onto GitHub, run these two commands in your PowerShell terminal:
-
-```powershell
-git pull --rebase origin main
-git push origin main
+A Supabase project with API credentials
