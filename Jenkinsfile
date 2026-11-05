@@ -10,8 +10,8 @@ pipeline {
 
         stage('Deploy to AWS Docker') {
             steps {
-                sh 'sudo docker compose down'
-                sh 'sudo docker compose up -d --build'
+                sh 'docker compose down'
+                sh 'docker compose up -d --build'
             }
         }
     }
