@@ -6,22 +6,28 @@ RUN npm install
 
 COPY . .
 
-# Safely overwrite the build script to skip strict TypeScript checking
-RUN npm pkg set scripts.build="vite build"
+ARG VITE_SUPABASE_PROJECT_ID=oyzhfgvdndiljxosibjm
+ARG VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_EfaCTghUb16MKe_k52QjrQ_1N-LvUBX
+ARG VITE_SUPABASE_URL=https://oyzhfgvdndiljxosibjm.supabase.co
+ARG VITE_API_URL=http://13.60.211.165:5000/api
 
-# Run the exact local build script
+ENV VITE_SUPABASE_PROJECT_ID=$VITE_SUPABASE_PROJECT_ID \
+    VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY \
+    VITE_SUPABASE_URL=$VITE_SUPABASE_URL \
+    VITE_API_URL=$VITE_API_URL \
+    NITRO_PRESET=node-server
+
+RUN npm pkg set scripts.build="vite build"
 RUN npm run build
 
-# If Vite output to 'build' instead of 'dist', rename it automatically
-RUN if [ -d "build" ]; then mv build dist; fi
-
-# Failsafe: if dist is still missing, create it so Docker doesn't crash
-RUN if [ ! -d "dist" ]; then mkdir dist && echo "Building dist..." > dist/index.html; fi
-
-FROM node:20-alpine
+FROM node:20-alpine AS runner
 WORKDIR /app
-RUN npm install -g serve
-COPY --from=builder /app/dist /app/dist
+
+ENV NODE_ENV=production \
+    PORT=8080 \
+    HOST=0.0.0.0
+
+COPY --from=builder /app/.output ./.output
 
 EXPOSE 8080
-CMD ["serve", "-s", "dist", "-l", "8080"]
+CMD ["node", ".output/server/index.mjs"]
