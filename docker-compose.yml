@@ -23,9 +23,6 @@ services:
     build:
       context: .
       dockerfile: src/Dockerfile
-      args:
-        VITE_SUPABASE_URL: https://oyzhfgvdndiljxosibjm.supabase.co
-        VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_EfaCTghUb16MKe_k52QjrQ_1N-LvUBX
     container_name: enterprise-frontend
     ports:
       - "8081:8080"
