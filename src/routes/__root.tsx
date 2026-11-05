@@ -29,24 +29,31 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
+  shellComponent: RootShell,
   component: RootComponent,
 });
 
-function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
-
+function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
         <HeadContent />
       </head>
       <body>
-        <QueryClientProvider client={queryClient}>
-          <Outlet />
-          <Toaster position="top-right" />
-        </QueryClientProvider>
+        {children}
         <Scripts />
       </body>
     </html>
+  );
+}
+
+function RootComponent() {
+  const { queryClient } = Route.useRouteContext();
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Outlet />
+      <Toaster position="top-right" />
+    </QueryClientProvider>
   );
 }
