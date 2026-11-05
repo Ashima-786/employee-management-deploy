@@ -14,7 +14,8 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/employee_db
+      - MONGO_URI=mongodb://ashima_db:Ashima41111@ac-vrj5mkm-shard-00-00.0nb6byc.mongodb.net:27017,ac-vrj5mkm-shard-00-01.0nb6byc.mongodb.net:27017,ac-vrj5mkm-shard-00-02.0nb6byc.mongodb.net:27017/?ssl=true&replicaSet=atlas-xyd4c8-shard-0&authSource=admin
+      - PORT=5000
     depends_on:
       - mongodb
 
@@ -22,14 +23,12 @@ services:
     build:
       context: .
       dockerfile: src/Dockerfile
+      args:
+        VITE_SUPABASE_URL: https://oyzhfgvdndiljxosibjm.supabase.co
+        VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_EfaCTghUb16MKe_k52QjrQ_1N-LvUBX
     container_name: enterprise-frontend
     ports:
       - "8081:8080"
-    environment:
-      - VITE_SUPABASE_URL=your_supabase_url_here
-      - VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_key_here
-      - SUPABASE_URL=your_supabase_url_here
-      - SUPABASE_PUBLISHABLE_KEY=your_supabase_key_here
     depends_on:
       - backend
 
