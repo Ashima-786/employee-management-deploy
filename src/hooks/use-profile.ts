@@ -33,9 +33,13 @@ export function useProfile() {
       }
 
       // 2. Check Supabase Auth session
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      let user: any = null;
+      try {
+        const res = await supabase.auth.getUser();
+        user = res?.data?.user ?? null;
+      } catch (err) {
+        console.warn("Supabase user check skipped or failed:", err);
+      }
 
       // If no Supabase session exists, fall back to the MongoDB/local session if signed in
       if (!user) {

@@ -15,18 +15,22 @@ function AuthenticatedLayout() {
     let active = true;
 
     const verifySession = async () => {
-      const savedUser = localStorage.getItem("enterprise_auth_user");
-      if (savedUser) {
-        if (active) setStatus("authed");
-        return;
-      }
+      try {
+        const savedUser = localStorage.getItem("enterprise_auth_user");
+        if (savedUser) {
+          if (active) setStatus("authed");
+          return;
+        }
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (active) {
-        setStatus(user ? "authed" : "unauthed");
+        const res = await supabase.auth.getUser().catch(() => ({ data: { user: null }, error: null }));
+        if (active) {
+          setStatus(res?.data?.user ? "authed" : "unauthed");
+        }
+      } catch (err) {
+        console.warn("Auth check failed:", err);
+        if (active) {
+          setStatus("unauthed");
+        }
       }
     };
 
