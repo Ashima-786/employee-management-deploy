@@ -54,6 +54,15 @@ resource "aws_security_group" "enterprise_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Jenkins CI/CD Automation Portal (Port 8080)
+  ingress {
+    description = "Jenkins CI/CD Automation Server"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # Outbound egress to internet
   egress {
     from_port   = 0

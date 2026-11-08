@@ -121,10 +121,35 @@ services:
     networks:
       - enterprise_net
 
+  jenkins:
+    build:
+      context: ./jenkins
+      dockerfile: Dockerfile
+    container_name: enterprise-jenkins
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false -Xms256m -Xmx512m
+    volumes:
+      - jenkins_data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./jenkins/init.groovy.d:/usr/share/jenkins/ref/init.groovy.d:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
+    networks:
+      - enterprise_net
+
 volumes:
   mongo_data:
   prometheus_data:
   grafana_data:
+  jenkins_data:
 
 networks:
   enterprise_net:

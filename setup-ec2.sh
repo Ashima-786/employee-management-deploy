@@ -77,5 +77,6 @@ echo "🌐 Web App (Nginx Edge):  http://$IP/"
 echo "📊 Grafana Dashboard:     http://$IP:3002"
 echo "📈 Prometheus Portal:     http://$IP/prometheus/ (or http://$IP:9090)"
 echo "🚀 Backend Health:        http://$IP/api/health"
+echo "🛠️ Jenkins Automation:    http://$IP:8080 (User: admin1 / Pass: admin1)"
 echo "=========================================================="
 
