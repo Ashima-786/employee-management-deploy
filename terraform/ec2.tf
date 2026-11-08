@@ -45,6 +45,15 @@ resource "aws_security_group" "enterprise_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Prometheus Direct Portal (Port 9090)
+  ingress {
+    description = "Prometheus Metrics Server"
+    from_port   = 9090
+    to_port     = 9090
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # Outbound egress to internet
   egress {
     from_port   = 0
@@ -107,3 +116,4 @@ resource "aws_instance" "app_server" {
     ManagedBy   = "Terraform"
   }
 }
+

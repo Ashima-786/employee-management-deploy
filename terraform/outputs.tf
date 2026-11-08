@@ -22,3 +22,4 @@ output "grafana_url" {
   description = "Grafana Observability Dashboard URL"
   value       = "http://${aws_instance.app_server.public_ip}:3002"
 }
+

@@ -69,11 +69,13 @@ sleep 15
 
 curl -sf http://127.0.0.1/api/health || curl -sf http://127.0.0.1:5000/api/health || echo "⚠️ Backend initializing..."
 
+IP=$(curl -s http://checkip.amazonaws.com || echo "localhost")
 echo "=========================================================="
 echo "🎉 DEPLOYMENT COMPLETE! All services are active."
 echo "=========================================================="
-echo "🌐 Web App (Nginx Edge):  http://$(curl -s http://checkip.amazonaws.com)/"
-echo "📊 Grafana Dashboard:     http://$(curl -s http://checkip.amazonaws.com):3002"
-echo "📈 Prometheus Portal:     http://$(curl -s http://checkip.amazonaws.com):9090"
-echo "🚀 Backend Health:        http://$(curl -s http://checkip.amazonaws.com)/api/health"
+echo "🌐 Web App (Nginx Edge):  http://$IP/"
+echo "📊 Grafana Dashboard:     http://$IP:3002"
+echo "📈 Prometheus Portal:     http://$IP/prometheus/ (or http://$IP:9090)"
+echo "🚀 Backend Health:        http://$IP/api/health"
 echo "=========================================================="
+
