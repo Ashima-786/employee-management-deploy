@@ -1,57 +1,112 @@
-# Employee Management System
+# Enterprise AI Workspace — Cloud-Native DevOps Platform
 
-A full-stack containerized enterprise workspace application designed to manage employee data, workspaces, and simulated commitment intelligence. This project demonstrates a modern cloud-native architecture using a decoupled frontend and backend, orchestrated with Docker, and deployed on an AWS EC2 instance.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js: v20](https://img.shields.io/badge/Node.js-v20-green.svg)](https://nodejs.org/)
+[![Docker](https://img.shields.io/badge/Docker-Multi--Stage-blue.svg)](https://www.docker.com/)
+[![AWS](https://img.shields.io/badge/AWS-Free%20Tier%20$0.00-orange.svg)](https://aws.amazon.com/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Minikube-326CE5.svg)](https://kubernetes.io/)
+[![Prometheus](https://img.shields.io/badge/Prometheus-v2.50.1-E6522C.svg)](https://prometheus.io/)
+[![Grafana](https://img.shields.io/badge/Grafana-10.4.0-F46800.svg)](https://grafana.com/)
 
-## 🚀 Tech Stack & Architecture
+An enterprise-grade, cloud-native DevOps blueprint demonstrating multi-tier containerization, automated Infrastructure as Code (Terraform), idempotent configuration management (Ansible), declarative 8-stage CI/CD pipelines (Jenkins + GitHub Actions), local Minikube Kubernetes orchestration with HPAs, and full-stack observability with Prometheus and Grafana.
 
-- Frontend: React, TypeScript, Tailwind CSS, Vite
-- Backend: Node.js, Express.js
-- Database: MongoDB Atlas (Cloud Database) & Drizzle ORM setup
-- Authentication: Supabase (Backend-as-a-Service)
-- DevOps & Orchestration: Docker, Docker Compose
-- Cloud Infrastructure: AWS EC2 (Ubuntu Linux)
+---
 
-## 📁 Project Directory Structure
+## 🏛️ System Architecture
 
-pixel-perfect-recreation-502-main/
-├── backend/ # Node.js & Express API Server
-│ ├── models/ # Database schemas (e.g., Workspace.js)
-│ ├── routes/ # API route controllers (e.g., workspaceRoutes.js)
-│ ├── server.js # Main Express application entry point
-│ ├── seed.js # Database seeding script
-│ ├── server.test.js # Backend unit tests
-│ ├── Dockerfile # Container configuration for the backend
-│ └── package.json # Backend-specific dependencies
-│
-├── src/ # React Frontend Application
-│ ├── components/ # Reusable UI components
-│ ├── pages/ # Main application views
-│ └── main.tsx # React application entry point
-│
-├── public/ # Static assets (images, icons, etc.)
-├── supabase/ # Supabase project configuration & edge functions
-├── drizzle/ # Drizzle ORM migrations and schemas
-│
-├── docker-compose.yml # Multi-container orchestration (Frontend + Backend)
-├── Dockerfile # Container configuration for the frontend
-├── drizzle.config.ts # Drizzle ORM configuration
-├── package.json # Root workspace and frontend dependencies
-├── .env # Global environment variables (Ignored by Git)
-└── README.md # Project documentation
+```mermaid
+graph TD
+    Client["🌐 Client Web Browser"] -->|Port 80 HTTP| Edge["🛡️ Nginx 1.27 Edge Proxy"]
+    
+    subgraph "Private Container Network (enterprise_net)"
+        Edge -->|/ (Root)| Frontend["⚛️ React TanStack SSR :8080"]
+        Edge -->|/api/*| Backend["🚀 Express.js REST API :5000"]
+        Edge -->|/prometheus/*| Prom["📊 Prometheus :9090"]
+        Edge -->|/grafana/*| Graf["📈 Grafana :3002"]
+        
+        Backend -->|Mongoose ODM| Mongo[("🍃 MongoDB Atlas / Local :27017")]
+        Prom -->|Scrapes /metrics| Backend
+        Graf -->|Datasource Query| Prom
+    end
+```
 
-✨ Key Features
-Secure Authentication: Offloaded user management, password hashing, and session handling entirely to Supabase for enterprise-grade security.
+---
 
-Workspace Management: RESTful API architecture for creating, fetching, and managing organizational workspaces via /backend/routes/workspaceRoutes.js.
+## 🚀 Key Modules & Capabilities
 
-Commitment Intelligence UI: A sophisticated frontend demonstration of AI-driven meeting analysis and project commitment tracking.
+### 1. Hardened Multi-Stage Containerization
+- **Frontend SPA**: Alpine-based SSR production build output served via Node standalone runtime.
+- **Backend API**: Stateless Express REST service with Prometheus `/metrics` telemetry.
+- **Daemon Logging Limits**: Configured `max-size: 10m` and `max-file: 3` to prevent disk exhaustion.
+- **Unified Local & Production Compose**: Single entry point on port 80 backed by Nginx reverse proxy.
 
-Containerized Environment: Fully orchestrated multi-container setup eliminating the "it works on my machine" problem, ensuring exact parity between local development and production environments.
+### 2. AWS Free Tier Zero-Cost ($0.00) Hardening
+- **Compute**: Single `t3.micro` EC2 instance (1 vCPU, 1 GB RAM, Ubuntu 24.04 LTS).
+- **Storage**: 20 GB gp3 root EBS volume (strictly within 30 GB Free Tier allowance).
+- **Linux Memory Engineering**: Configured 2 GB persistent swapfile with kernel `vm.swappiness=10` to eliminate OOM killed processes during builds.
 
-🛠️ Local Development Setup
-Prerequisites
-Docker & Docker Compose installed
+### 3. Infrastructure as Code (Terraform)
+Located in [`terraform/`](file:///d:/Projects/AWS_Devops_Employee_Mang/terraform):
+- `main.tf`: Provider version pinning.
+- `variables.tf`: Configurable region, instance types, and storage parameters.
+- `ec2.tf`: Security group ingress/egress rules, gp3 root device, and automated user-data swap creation.
+- `outputs.tf`: Public IP, DNS, and web endpoints.
 
-A MongoDB Atlas cluster URI
+```bash
+cd terraform
+terraform init
+terraform plan
+terraform apply -auto-approve
+```
 
-A Supabase project with API credentials
+### 4. Idempotent Configuration Management (Ansible)
+Located in [`ansible/`](file:///d:/Projects/AWS_Devops_Employee_Mang/ansible):
+- Installs Docker Engine and Docker Compose v2.
+- Hardens system with 2 GB swapfile and swappiness tuning.
+- Applies daemon logging rotation governance.
+- Synchronizes repo and triggers automated smoke tests.
+
+```bash
+ansible-playbook -i ansible/inventory.ini ansible/deploy-playbook.yml
+```
+
+### 5. Declarative 8-Stage CI/CD Pipeline
+Configured in [`Jenkinsfile`](file:///d:/Projects/AWS_Devops_Employee_Mang/Jenkinsfile):
+1. **Checkout SCM**: Clones target Git repository.
+2. **Code Quality & Tests**: Parallel execution of Jest unit tests and frontend validation.
+3. **DevSecOps Filesystem Scan**: Trivy scan gating Critical & High CVEs.
+4. **Docker Multi-Stage Build**: Builds production container images.
+5. **Container Image Scan**: Trivy audit on container layers.
+6. **Registry Publish**: Tags and pushes versioned images to Docker Hub.
+7. **Terraform Validation**: Validates IaC configurations.
+8. **EC2 Deploy & Smoke Test**: Deploys via SSH and executes automated HTTP 200 healthcheck.
+
+### 6. Kubernetes Cluster Orchestration (Minikube)
+Located in [`k8s/`](file:///d:/Projects/AWS_Devops_Employee_Mang/k8s):
+- `01-namespace.yaml`: Dedicated `enterprise-workspace` namespace.
+- `02-config-secrets.yaml`: ConfigMaps and base64 Secrets.
+- `03-mongo-statefulset.yaml`: StatefulSet + 5Gi PVC + Headless Service.
+- `04-backend-deployment.yaml`: Rolling updates with Liveness & Readiness probes.
+- `05-frontend-deployment.yaml`: Replicated frontend with NodePort service.
+- `06-hpa.yaml`: HorizontalPodAutoscalers scaling replicas dynamically based on CPU/Memory utilization.
+
+```bash
+kubectl apply -f k8s/01-namespace.yaml
+kubectl apply -f k8s/
+kubectl get all -n enterprise-workspace
+```
+
+### 7. Observability (Prometheus & Grafana)
+- **Metrics Collected**:
+  - `http_requests_total`
+  - `http_request_duration_seconds` (p95 latency)
+  - `workspace_employees_total` (Active employee gauge)
+  - `workspace_employee_operations_total` (CRUD counters)
+- **Grafana Provisioning**: Automated datasource creation and pre-built operational telemetry dashboards at [`http://localhost:3002`](http://localhost:3002).
+
+### 8. Traffic Simulation & Demonstration Script
+Generate realistic mock user traffic to populate Prometheus and Grafana meters:
+
+```bash
+python scripts/load_simulate.py http://localhost:5000
+```

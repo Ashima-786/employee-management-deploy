@@ -6,7 +6,14 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
+    networks:
+      - enterprise_net
 
   backend:
     build: ./backend
@@ -16,8 +23,15 @@ services:
     environment:
       - MONGO_URI=mongodb://ashima_db:Ashima41111@ac-vrj5mkm-shard-00-00.0nb6byc.mongodb.net:27017,ac-vrj5mkm-shard-00-01.0nb6byc.mongodb.net:27017,ac-vrj5mkm-shard-00-02.0nb6byc.mongodb.net:27017/?ssl=true&replicaSet=atlas-xyd4c8-shard-0&authSource=admin
       - PORT=5000
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     depends_on:
       - mongodb
+    networks:
+      - enterprise_net
 
   frontend:
     build:
@@ -27,22 +41,91 @@ services:
         VITE_SUPABASE_PROJECT_ID: oyzhfgvdndiljxosibjm
         VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_EfaCTghUb16MKe_k52QjrQ_1N-LvUBX
         VITE_SUPABASE_URL: https://oyzhfgvdndiljxosibjm.supabase.co
-        VITE_API_URL: http://13.60.211.165:5000/api
+        VITE_API_URL: /api
     container_name: enterprise-frontend
     ports:
       - "8081:8080"
     environment:
       - PORT=8080
       - HOST=0.0.0.0
-      - VITE_SUPABASE_PROJECT_ID=oyzhfgvdndiljxosibjm
-      - VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_EfaCTghUb16MKe_k52QjrQ_1N-LvUBX
-      - VITE_SUPABASE_URL=https://oyzhfgvdndiljxosibjm.supabase.co
-      - SUPABASE_PROJECT_ID=oyzhfgvdndiljxosibjm
-      - SUPABASE_PUBLISHABLE_KEY=sb_publishable_EfaCTghUb16MKe_k52QjrQ_1N-LvUBX
-      - SUPABASE_URL=https://oyzhfgvdndiljxosibjm.supabase.co
-      - VITE_API_URL=http://13.60.211.165:5000/api
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     depends_on:
       - backend
+    networks:
+      - enterprise_net
+
+  prometheus:
+    image: prom/prometheus:v2.50.1
+    container_name: enterprise-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
+    networks:
+      - enterprise_net
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    container_name: enterprise-grafana
+    ports:
+      - "3002:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - enterprise_net
+
+  edge-proxy:
+    image: nginx:1.27-alpine
+    container_name: enterprise-edge-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    depends_on:
+      - frontend
+      - backend
+      - prometheus
+      - grafana
+    restart: unless-stopped
+    networks:
+      - enterprise_net
 
 volumes:
   mongo_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  enterprise_net:
+    driver: bridge
