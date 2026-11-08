@@ -22,3 +22,4 @@ instance.setInstallState(InstallState.INITIAL_SETUP_COMPLETED)
 instance.save()
 
 println("--> [Automated Setup] Successfully configured admin1 / admin1 with Full Control!")
+

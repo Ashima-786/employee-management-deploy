@@ -20,3 +20,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY init.groovy.d/ /usr/share/jenkins/ref/init.groovy.d/
 
 USER root
+
