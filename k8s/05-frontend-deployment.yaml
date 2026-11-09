@@ -22,10 +22,15 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: shoyo44/zestora-frontend:latest
-          imagePullPolicy: IfNotPresent
+          image: docker.io/library/employee-workspace-frontend:latest
+          imagePullPolicy: Never
           ports:
-            - containerPort: 3000
+            - containerPort: 8080
+          env:
+            - name: PORT
+              value: "8080"
+            - name: HOST
+              value: "0.0.0.0"
           resources:
             requests:
               cpu: 100m
@@ -35,14 +40,14 @@ spec:
               memory: 512Mi
           livenessProbe:
             httpGet:
-              path: /healthz
-              port: 3000
+              path: /
+              port: 8080
             initialDelaySeconds: 15
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /healthz
-              port: 3000
+              path: /
+              port: 8080
             initialDelaySeconds: 5
             periodSeconds: 5
 ---
@@ -55,7 +60,7 @@ spec:
   type: NodePort
   ports:
     - port: 80
-      targetPort: 3000
+      targetPort: 8080
       nodePort: 30080
   selector:
     app: frontend

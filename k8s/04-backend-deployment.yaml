@@ -22,8 +22,8 @@ spec:
     spec:
       containers:
         - name: backend
-          image: shoyo44/zestora-backend:latest
-          imagePullPolicy: IfNotPresent
+          image: docker.io/library/employee-workspace-backend:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 5000
           envFrom:
