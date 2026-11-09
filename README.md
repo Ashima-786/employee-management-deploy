@@ -19,16 +19,16 @@
 
 | Service | URL | Credentials / Notes |
 |---|---|---|
-| **Web App** | [http://98.84.183.69/](http://98.84.183.69/) | Live Multi-Tier Production Host (AWS EC2) |
+| **Web App (Enterprise)** | [http://98.84.183.69/](http://98.84.183.69/) | Live Multi-Tier Production Host (AWS EC2) |
+| **Jenkins CI/CD Pipeline** | [http://98.84.183.69:8080/job/Employee_MAnagement/](http://98.84.183.69:8080/job/Employee_MAnagement/) | `admin1` / `admin1` (Stage View & Graph View active) |
 | **Grafana Dashboard** | [http://98.84.183.69:3002/](http://98.84.183.69:3002/) | `admin` / `admin` (Operational Telemetry) |
 | **Prometheus Portal** | [http://98.84.183.69/prometheus/graph](http://98.84.183.69/prometheus/graph) | Active Metric Scrapes & Alert Rules |
 | **Health API** | [http://98.84.183.69/api/health](http://98.84.183.69/api/health) | `{"status":"Operational","service":"Enterprise AI Workspace API"}` |
-| **Jenkins CI/CD** | [http://98.84.183.69:8080/](http://98.84.183.69:8080/) | `admin1` / `admin1` (Automated Provisioning) |
 | **GitHub Repository** | [https://github.com/Ashima-786/employee-management-deploy](https://github.com/Ashima-786/employee-management-deploy) | Source Repository (`main` branch) |
 | **GitHub Actions** | [Actions Workflow](https://github.com/Ashima-786/employee-management-deploy/actions) | Cloud DevSecOps & EC2 Deployment |
 | **Docker Hub (Frontend)** | `shoyo44/employee-frontend:latest` | Multi-stage production container |
 | **Docker Hub (Backend)** | `shoyo44/employee-backend:latest` | Stateless API container |
-| **K8s Dashboard** | `minikube dashboard` | Interactive visual GUI in `enterprise-workspace` namespace |
+| **K8s Dashboard (Minikube)**| `http://127.0.0.1:60801/...` | Dual Namespace: `enterprise-workspace` & `zestora` |
 
 ---
 
@@ -179,6 +179,9 @@ AWS_Devops_Employee_Mang/
 
 ### Jenkins — 8-Stage Declarative Pipeline
 
+Direct Pipeline Job: [http://98.84.183.69:8080/job/Employee_MAnagement/](http://98.84.183.69:8080/job/Employee_MAnagement/)  
+Credentials: `admin1` / `admin1`
+
 ```
 ✅ Stage 1: Checkout          — Clone latest commit from GitHub main
 ✅ Stage 2: Code Quality      — Parallel: Backend Jest Tests + Frontend TypeScript Validation
@@ -189,6 +192,10 @@ AWS_Devops_Employee_Mang/
 ✅ Stage 7: Terraform         — Terraform plan & infrastructure validation
 ✅ Stage 8: Deploy & Verify   — Deploy to AWS EC2 + Automated HTTP 200 healthcheck
 ```
+
+#### Visual Pipeline Plugins Installed:
+- **`pipeline-stage-view`**: Renders the horizontal status matrix with per-stage timing, status logs, and green progress indicators.
+- **`pipeline-graph-view`**: Interactive flowchart DAG displaying sequential and parallel execution branches directly in the Jenkins web UI.
 
 ### GitHub Actions — Continuous Delivery
 
@@ -212,23 +219,31 @@ Every push to `main` triggers:
 
 ---
 
-## ☸️ Kubernetes Orchestration & Minikube
+## ☸️ Kubernetes Orchestration & Dual Showcase (Minikube)
 
-Deploy the full stack locally with **Minikube** (and ready for AWS EKS) under the dedicated `enterprise-workspace` namespace:
+Both the **Enterprise AI Workspace** and the **Zestora Platform** are actively orchestrated concurrently inside the Minikube cluster:
+
+| Platform | Namespace | Components | Access Command |
+|---|---|---|---|
+| **Enterprise Workspace** | `enterprise-workspace` | 2x Frontend, 2x Backend, MongoDB, HPAs | `minikube service frontend -n enterprise-workspace` |
+| **Zestora Food Platform**| `zestora` | 2x Frontend, 4x Backend, MongoDB, HPAs | `minikube service zestora-frontend -n zestora` |
+
+### Quick Start Commands:
 
 ```bash
-# Start Minikube cluster
-minikube start --driver=docker --memory=2048m --cpus=2
+# 1. Start Minikube cluster
+minikube start --driver=docker
 
-# Enable metrics server for HPA autoscaling
-minikube addons enable metrics-server
-
-# Apply all production manifests
+# 2. Deploy Enterprise Workspace manifests
 kubectl apply -f k8s/01-namespace.yaml
 kubectl apply -f k8s/
 
-# Verify running workloads
-kubectl get all -n enterprise-workspace
+# 3. View all workloads across both projects
+kubectl get pods -A
+
+# 4. Open Minikube Dashboard
+minikube dashboard
+# (Select 'All namespaces' from top dropdown to view both projects side-by-side)
 ```
 
 ---
