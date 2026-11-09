@@ -19,3 +19,4 @@ React 18 Single Page Application (SPA) built with TypeScript, TanStack Router, T
 ```bash
 docker build -t shoyo44/employee-frontend:latest -f src/Dockerfile .
 ```
+
