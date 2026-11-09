@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: shoyo44/employee-backend:latest
+          image: shoyo44/zestora-backend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000

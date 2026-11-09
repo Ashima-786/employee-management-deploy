@@ -22,15 +22,10 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: shoyo44/employee-frontend:latest
+          image: shoyo44/zestora-frontend:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8080
-          env:
-            - name: PORT
-              value: "8080"
-            - name: HOST
-              value: "0.0.0.0"
+            - containerPort: 3000
           resources:
             requests:
               cpu: 100m
@@ -40,14 +35,14 @@ spec:
               memory: 512Mi
           livenessProbe:
             httpGet:
-              path: /
-              port: 8080
+              path: /healthz
+              port: 3000
             initialDelaySeconds: 15
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /
-              port: 8080
+              path: /healthz
+              port: 3000
             initialDelaySeconds: 5
             periodSeconds: 5
 ---
@@ -59,8 +54,8 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - port: 8080
-      targetPort: 8080
+    - port: 80
+      targetPort: 3000
       nodePort: 30080
   selector:
     app: frontend
