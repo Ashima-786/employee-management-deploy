@@ -50,3 +50,4 @@ Select the **`enterprise-workspace`** namespace from the top navigation to view 
 ```bash
 minikube service frontend-service -n enterprise-workspace
 ```
+

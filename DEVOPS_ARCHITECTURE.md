@@ -78,3 +78,4 @@ flowchart TD
    - Vulnerability scanning is enforced automatically during code check-in and before image promotion.
 3. **Resilience & Swap Hardening**:
    - The Linux kernel is tuned with a 2 GB persistent swapfile and `vm.swappiness=10` to guarantee memory stability during high-throughput loads on AWS Free Tier instances.
+

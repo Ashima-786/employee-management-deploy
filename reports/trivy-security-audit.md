@@ -35,3 +35,4 @@
 2. **Minimal Base Images**: Using lightweight Alpine (`node:20-alpine`, `nginx:1.27-alpine`) and Debian Slim images eliminates unnecessary build tools, compilers, and shell utilities from runtime environments.
 3. **Multi-Stage Build Pipeline**: Build tools (such as TypeScript compilers, source map generators, and devDependencies) are discarded in intermediate build stages.
 4. **Secret Isolation**: Zero secrets, API keys, or private SSH tokens are embedded inside container images; all sensitive credentials are supplied via environment variables, Kubernetes Secrets, or Jenkins Credential Store.
+

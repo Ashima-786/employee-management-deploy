@@ -55,3 +55,4 @@ This document details the **8-Stage Declarative Pipeline** implemented in [`Jenk
 ### Stage 8: Production EC2 Deployment & Smoke Gating
 * **Goal**: Connects securely to the target EC2 host via SSH, pulls latest code, runs `docker compose up -d`, and validates HTTP 200 on `/api/health`.
 * **Gating check**: Automated curl verification against `http://localhost/api/health`.
+

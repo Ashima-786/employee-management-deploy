@@ -32,3 +32,4 @@ ansible-playbook -i ansible/inventory.ini ansible/deploy-playbook.yml --syntax-c
 # 2. Execute idempotent provisioning
 ansible-playbook -i ansible/inventory.ini ansible/deploy-playbook.yml
 ```
+
