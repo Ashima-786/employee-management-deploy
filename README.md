@@ -26,8 +26,10 @@
 | **Health API** | [http://98.84.183.69/api/health](http://98.84.183.69/api/health) | `{"status":"Operational","service":"Enterprise AI Workspace API"}` |
 | **GitHub Repository** | [https://github.com/Ashima-786/employee-management-deploy](https://github.com/Ashima-786/employee-management-deploy) | Source Repository (`main` branch) |
 | **GitHub Actions** | [Actions Workflow](https://github.com/Ashima-786/employee-management-deploy/actions) | Cloud DevSecOps & EC2 Deployment |
-| **Docker Hub (Frontend)** | `shoyo44/employee-frontend:latest` | Multi-stage production container |
-| **Docker Hub (Backend)** | `shoyo44/employee-backend:latest` | Stateless API container |
+| **Docker Hub (Frontend)** | [shoyo44/employee-frontend](https://hub.docker.com/r/shoyo44/employee-frontend) | `docker pull shoyo44/employee-frontend:latest` |
+| **Docker Hub (Backend)** | [shoyo44/employee-backend](https://hub.docker.com/r/shoyo44/employee-backend) | `docker pull shoyo44/employee-backend:latest` |
+| **Docker Hub (Zestora FE)** | [shoyo44/zestora-frontend](https://hub.docker.com/r/shoyo44/zestora-frontend) | `docker pull shoyo44/zestora-frontend:latest` |
+| **Docker Hub (Zestora BE)** | [shoyo44/zestora-backend](https://hub.docker.com/r/shoyo44/zestora-backend) | `docker pull shoyo44/zestora-backend:latest` |
 | **K8s Dashboard (Minikube)**| `http://127.0.0.1:60801/...` | Dual Namespace: `enterprise-workspace` & `zestora` |
 
 ---
@@ -109,7 +111,7 @@ flowchart TD
 | Category | Technology | Details |
 |---|---|---|
 | **Containerization** | Docker | Multi-stage hardened builds, non-root execution, 10MB log rotation |
-| **Registries** | Docker Hub | Public versioned images (`shoyo44/employee-*`) |
+| **Registries** | [Docker Hub Profile](https://hub.docker.com/u/shoyo44) | Public versioned containers (`shoyo44/employee-*`, `shoyo44/zestora-*`) |
 | **Orchestration** | Kubernetes & Minikube | 6 production manifests in `enterprise-workspace` namespace, StatefulSet, 5Gi PVC, HPAs |
 | **Config Management**| Ansible | Idempotent playbook configuring Docker, swap memory, log caps, and smoke tests |
 | **CI/CD** | Jenkins | 8-stage declarative pipeline (SCM → Test → Trivy → Build → Scan → Push → Terraform → Deploy) |
